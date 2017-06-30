@@ -35,13 +35,14 @@ class InputFileCsvWithDateFormatsComponent(iFileDelimitedEntity: InputFileDelimi
 //    val dateFormats=schemaCreator.getDateFormats()
 //    val schemaField = schemaCreator.makeSchema
     try {
-      val df = iComponentsParams.getSparkSession().read
-        .option("delimiter", iFileDelimitedEntity.getDelimiter)
-        .option("quote", iFileDelimitedEntity.getQuote)
-        .option("header", iFileDelimitedEntity.isHasHeader)
-        .option("charset", iFileDelimitedEntity.getCharset)
-        .option("safe", iFileDelimitedEntity.isSafe)
-        .option("strict", iFileDelimitedEntity.isStrict)
+      val sqlContext = new org.apache.spark.sql.SQLContext(iComponentsParams.getSparkSession())
+      val df = sqlContext.read
+        //.option("delimiter", iFileDelimitedEntity.getDelimiter)
+        //.option("quote", iFileDelimitedEntity.getQuote)
+        //.option("header", iFileDelimitedEntity.isHasHeader)
+        //.option("charset", iFileDelimitedEntity.getCharset)
+        //.option("safe", iFileDelimitedEntity.isSafe)
+        //.option("strict", iFileDelimitedEntity.isStrict)
         .option("dateFormats", schemaCreator.getDateFormats)
         .option("componentId", iFileDelimitedEntity.getComponentId)
         .schema(schemaCreator.makeSchema)

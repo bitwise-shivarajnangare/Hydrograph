@@ -37,15 +37,15 @@ BaseComponentParams) extends SparkFlow with Serializable {
 
     try {
       cp.getDataFrame().select(schemaCreator.createSchema(): _*).write
-        .option("delimiter", outputFileDelimitedEntity.getDelimiter)
-        .option("quote", outputFileDelimitedEntity.getQuote)
-        .option("header", outputFileDelimitedEntity.getHasHeader)
-        .option("charset", outputFileDelimitedEntity.getCharset)
-        .option("mode", outputFileDelimitedEntity.isStrict match {
+        //.option("delimiter", outputFileDelimitedEntity.getDelimiter)
+        //.option("quote", outputFileDelimitedEntity.getQuote)
+        //.option("header", outputFileDelimitedEntity.getHasHeader)
+        //.option("charset", outputFileDelimitedEntity.getCharset)
+        /*.option("mode", outputFileDelimitedEntity.isStrict match {
           case true => "FAILFAST"
           case false => "PERMISSIVE"
-        })
-        .option("safe", outputFileDelimitedEntity.getSafe)
+        })*/
+        //.option("safe", outputFileDelimitedEntity.getSafe)
         .option("dateFormats", schemaCreator.getDateFormats)
         .option("codec", SchemaUtils().getCodec(outputFileDelimitedEntity))
         .mode(if (outputFileDelimitedEntity.isOverWrite) SaveMode.Overwrite else SaveMode.ErrorIfExists)

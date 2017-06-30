@@ -120,10 +120,11 @@ class NormalizeComponent(normalizeEntity: NormalizeEntity, componentsParams: Bas
         outputDispatcher.getOutRows
       })
       it
-    })(RowEncoder(outputSchema))
+    })//(RowEncoder(outputSchema))
 
     val key = normalizeEntity.getOutSocketList.get(0).getSocketId
-      Map(key -> df)
+    val sqlContext = new org.apache.spark.sql.SQLContext(componentsParams.sparkSession)
+      Map(key -> sqlContext.createDataFrame(df,outputSchema))
   }
 }
 

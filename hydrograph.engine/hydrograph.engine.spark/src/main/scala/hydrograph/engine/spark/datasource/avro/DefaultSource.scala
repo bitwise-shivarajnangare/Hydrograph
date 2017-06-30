@@ -29,13 +29,12 @@ import org.apache.hadoop.conf.Configuration
 import org.apache.hadoop.fs.{FileStatus, Path}
 import org.apache.hadoop.mapreduce.Job
 import org.slf4j.LoggerFactory
-
-import org.apache.spark.TaskContext
-import org.apache.spark.sql.SparkSession
+import org.apache.spark.{SparkContext, TaskContext}
+import org.apache.spark.sql.SQLContext
 import org.apache.spark.sql.catalyst.InternalRow
 import org.apache.spark.sql.catalyst.encoders.RowEncoder
 import org.apache.spark.sql.catalyst.expressions.GenericRow
-import org.apache.spark.sql.execution.datasources.{FileFormat, OutputWriterFactory, PartitionedFile}
+import org.apache.spark.sql.sources.OutputWriterFactory
 import org.apache.spark.sql.sources.{DataSourceRegister, Filter}
 import org.apache.spark.sql.types.StructType
 import com.esotericsoftware.kryo.Kryo
@@ -50,18 +49,18 @@ import hydrograph.engine.spark.components.OutputFileAvroComponent
  * @author Bitwise
  *
  */
-private class DefaultSource extends FileFormat with DataSourceRegister {
+private class DefaultSource extends DataSourceRegister {
  private val log = LoggerFactory.getLogger(getClass)
 
   override def equals(other: Any): Boolean = other match {
     case _: DefaultSource => true
     case _ => false
   }
-  override def inferSchema(
-      spark: SparkSession,
-      options: Map[String, String],
-      files: Seq[FileStatus]): Option[StructType] = {
-    val conf = spark.sparkContext.hadoopConfiguration
+  def inferSchema(
+                            spark: SparkContext,
+                            options: Map[String, String],
+                            files: Seq[FileStatus]): Option[StructType] = {
+    val conf = spark.hadoopConfiguration
     
     val sampleFile = if (conf.getBoolean(IgnoreFilesWithoutExtensionProperty, true)) {
       files.find(_.getPath.getName.endsWith(".avro")).getOrElse {
@@ -103,13 +102,13 @@ private class DefaultSource extends FileFormat with DataSourceRegister {
 
   override def shortName(): String = "avro"
 
-  override def isSplitable(
-      sparkSession: SparkSession,
+  def isSplitable(
+      sparkSession: SparkContext,
       options: Map[String, String],
       path: Path): Boolean = true
 
-  override def prepareWrite(
-      spark: SparkSession,
+  def prepareWrite(
+      spark: SparkContext,
       job: Job,
       options: Map[String, String],
       dataSchema: StructType): OutputWriterFactory = {
@@ -122,7 +121,7 @@ private class DefaultSource extends FileFormat with DataSourceRegister {
     val AVRO_DEFLATE_LEVEL = "spark.sql.avro.deflate.level"
     val COMPRESS_KEY = "mapred.output.compress"
 
-    spark.conf.get(AVRO_COMPRESSION_CODEC, "snappy") match {
+    spark.getConf.get(AVRO_COMPRESSION_CODEC, "snappy") match {
       case "uncompressed" =>
         log.info("writing uncompressed Avro records")
         job.getConfiguration.setBoolean(COMPRESS_KEY, false)
@@ -133,7 +132,7 @@ private class DefaultSource extends FileFormat with DataSourceRegister {
         job.getConfiguration.set(AvroJob.CONF_OUTPUT_CODEC, DataFileConstants.SNAPPY_CODEC)
 
       case "deflate" =>
-        val deflateLevel = spark.conf.get(
+        val deflateLevel = spark.getConf.get(
           AVRO_DEFLATE_LEVEL, Deflater.DEFAULT_COMPRESSION.toString).toInt
         log.info(s"compressing Avro output using deflate (level=$deflateLevel)")
         job.getConfiguration.setBoolean(COMPRESS_KEY, true)
@@ -147,28 +146,28 @@ private class DefaultSource extends FileFormat with DataSourceRegister {
     new AvroOutputGeneratorFactory(dataSchema, recordName, recordNamespace)
   }
 
-  override def buildReader(
-      spark: SparkSession,
+  def buildReader(
+      spark: SparkContext,
       dataSchema: StructType,
       partitionSchema: StructType,
       requiredSchema: StructType,
       filters: Seq[Filter],
       options: Map[String, String],
-      hadoopConf: Configuration): (PartitionedFile) => Iterator[InternalRow] = {
+      hadoopConf: Configuration): (File) => Iterator[InternalRow] = {
 
     val broadcastedConf =
-      spark.sparkContext.broadcast(new SerializableConfiguration(hadoopConf))
+      spark.broadcast(new SerializableConfiguration(hadoopConf))
 
-    (file: PartitionedFile) => {
+    (file: File) => {
       val log = LoggerFactory.getLogger(classOf[DefaultSource])
       val conf = broadcastedConf.value.value
       val userProvidedSchema = options.get(AvroSchema).map(new Schema.Parser().parse)
       if (conf.getBoolean(IgnoreFilesWithoutExtensionProperty, true) &&
-        !file.filePath.endsWith(".avro")) {
+        !file.getAbsolutePath.endsWith(".avro")) {
         Iterator.empty
       } else {
         val reader = {
-          val in = new FsInput(new Path(new URI(file.filePath)), conf)
+          val in = new FsInput(new Path(new URI(file.getAbsolutePath)), conf)
           try {
             val datumReader = userProvidedSchema match {
               case Some(userSchema) => new GenericDatumReader[GenericRecord](userSchema)
@@ -190,8 +189,8 @@ private class DefaultSource extends FileFormat with DataSourceRegister {
           }
         }
 
-        reader.sync(file.start)
-        val stop = file.start + file.length
+        //reader.sync(file.)
+        val stop = 0 + file.length
      
         CustomAvroToSpark.compareSchema(userProvidedSchema.getOrElse(reader.getSchema), dataSchema)
         val rowConverter = CustomAvroToSpark.createConverterToSQL(

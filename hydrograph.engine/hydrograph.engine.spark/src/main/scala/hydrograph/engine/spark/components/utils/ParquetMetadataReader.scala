@@ -20,8 +20,9 @@ import org.apache.parquet.schema.OriginalType._
 import org.apache.parquet.schema.PrimitiveType.PrimitiveTypeName._
 import org.apache.parquet.schema.Type.Repetition._
 import org.apache.parquet.schema._
-import org.apache.spark.sql.SparkSession
-import org.apache.spark.sql.internal.SQLConf
+import org.apache.spark.SparkContext
+import org.apache.spark.sql.SQLContext
+import org.apache.spark.sql.SQLConf
 import org.apache.spark.sql.types._
 
 import scala.collection.JavaConverters._
@@ -33,9 +34,9 @@ import scala.collection.JavaConverters._
   *
   */
 class ParquetMetadataReader(
-                             assumeBinaryIsString: Boolean = SQLConf.PARQUET_BINARY_AS_STRING.defaultValue.get,
-                             assumeInt96IsTimestamp: Boolean = SQLConf.PARQUET_INT96_AS_TIMESTAMP.defaultValue.get,
-                             writeLegacyParquetFormat: Boolean = SQLConf.PARQUET_WRITE_LEGACY_FORMAT.defaultValue.get) {
+                             assumeBinaryIsString: Boolean = false,
+                             assumeInt96IsTimestamp: Boolean = true,
+                             writeLegacyParquetFormat: Boolean = false) {
 
   /*  def this(conf: SQLConf) = this(
       assumeBinaryIsString = conf.isParquetBinaryAsString,
@@ -46,19 +47,20 @@ class ParquetMetadataReader(
     * get the Parquet File Schema from  ParquetMetadata
     *
     */
-  def getParquetFileSchema(path: String, session: SparkSession): StructType = {
-    val parquetFile: ParquetMetadata = ParquetFileReader.readFooter(session.sparkContext.hadoopConfiguration, new Path(path))
+  def getParquetFileSchema(path: String, session: SparkContext): StructType = {
+    val parquetFile: ParquetMetadata = ParquetFileReader.readFooter(session.hadoopConfiguration, new Path(path))
     val msgType = parquetFile.getFileMetaData.getSchema
+
 
     convert(msgType)
   }
 
 
   def this(conf: Configuration) = this(
-    assumeBinaryIsString = conf.get(SQLConf.PARQUET_BINARY_AS_STRING.key).toBoolean,
-    assumeInt96IsTimestamp = conf.get(SQLConf.PARQUET_INT96_AS_TIMESTAMP.key).toBoolean,
-    writeLegacyParquetFormat = conf.get(SQLConf.PARQUET_WRITE_LEGACY_FORMAT.key,
-      SQLConf.PARQUET_WRITE_LEGACY_FORMAT.defaultValue.get.toString).toBoolean)
+    assumeBinaryIsString = false,
+    assumeInt96IsTimestamp = true,
+    writeLegacyParquetFormat = false
+    )
 
   /**
     * Converts Parquet [[MessageType]] `parquetSchema` to a Spark SQL [[StructType]].
@@ -134,7 +136,7 @@ class ParquetMetadataReader(
           case INT_16 => ShortType
           case INT_32 | null => IntegerType
           case DATE => DateType
-          case DECIMAL => makeDecimalType(Decimal.MAX_INT_DIGITS)
+          case DECIMAL => makeDecimalType(Decimal.MAX_LONG_DIGITS)
           case UINT_8 => typeNotSupported()
           case UINT_16 => typeNotSupported()
           case UINT_32 => typeNotSupported()
@@ -155,7 +157,7 @@ class ParquetMetadataReader(
         ParquetSchemaConverter.checkConversionRequirement(
           assumeInt96IsTimestamp,
           "INT96 is not supported unless it's interpreted as timestamp. " +
-            s"Please try to set ${SQLConf.PARQUET_INT96_AS_TIMESTAMP.key} to true.")
+            s"Please try to set PARQUET_INT96_AS_TIMESTAMP to true.")
         TimestampType
 
       case BINARY =>
@@ -391,7 +393,7 @@ class ParquetMetadataReader(
 
       // Uses INT32 for 1 <= precision <= 9
       case Fixed(precision, scale)
-        if precision <= Decimal.MAX_INT_DIGITS && !writeLegacyParquetFormat =>
+        if precision <= Decimal.MAX_LONG_DIGITS && !writeLegacyParquetFormat =>
         Types
           .primitive(INT32, repetition)
           .as(DECIMAL)

@@ -197,7 +197,7 @@ class DefaultSource extends RelationProvider with SchemaRelationProvider with Cr
       "" // There is no need to generate header in this case
     }
 
-    val codec = CompressionCodecs.getCodec(dataFrame.sparkSession.sparkContext, parameters.getOrElse("codec", null))
+    val codec = CompressionCodecs.getCodec(dataFrame.sqlContext.sparkContext, parameters.getOrElse("codec", null))
     val schema = dataFrame.schema
     val schemaFields = schema.fields
 

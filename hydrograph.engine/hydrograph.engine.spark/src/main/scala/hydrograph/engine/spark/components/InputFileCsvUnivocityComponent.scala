@@ -35,12 +35,14 @@ class InputFileCsvUnivocityComponent(iFileDelimitedEntity: InputFileDelimitedEnt
     LOG.trace("In method createComponent()")
     val schemaCreator = SchemaCreator(iFileDelimitedEntity)
     try {
-      val df = iComponentsParams.getSparkSession().read
-        .option("delimiter", iFileDelimitedEntity.getDelimiter)
-        .option("quote", iFileDelimitedEntity.getQuote)
-        .option("header", iFileDelimitedEntity.isHasHeader)
-        .option("charset", iFileDelimitedEntity.getCharset)
-        .option("safe", iFileDelimitedEntity.isSafe)
+      iComponentsParams.getSparkSession()
+      val sqlContext = new org.apache.spark.sql.SQLContext(iComponentsParams.getSparkSession())
+      val df = sqlContext.read
+        //.option("delimiter", iFileDelimitedEntity.getDelimiter)
+        //.option("quote", iFileDelimitedEntity.getQuote)
+        //.option("header", iFileDelimitedEntity.isHasHeader)
+        //.option("charset", iFileDelimitedEntity.getCharset)
+        //.option("safe", iFileDelimitedEntity.isSafe)
         .option("mode", iFileDelimitedEntity.isStrict match {
           case true => "FAILFAST"
           case false => "PERMISSIVE"

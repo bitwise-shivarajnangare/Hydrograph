@@ -62,7 +62,8 @@ class InputSparkRedshiftComponent(inputRDBMSEntity: InputRDBMSEntity, iComponent
     LOG.info("Connection  url for input Spark Redshift  component: " + connectionURL)
 
     try {
-      val dataFrameReader = sparkSession.read
+      val sqlContext = new org.apache.spark.sql.SQLContext(sparkSession)
+      val dataFrameReader = sqlContext.read
         .format("com.databricks.spark.redshift")
         .option("url", connectionURL)
         .option("query", selectQuery)
@@ -70,7 +71,7 @@ class InputSparkRedshiftComponent(inputRDBMSEntity: InputRDBMSEntity, iComponent
         .option("password", inputRDBMSEntity.getPassword)
         .option("tempdir", inputRDBMSEntity.getTemps3dir)
 
-      val df = getDataFrameReader(sparkSession.sparkContext.hadoopConfiguration,dataFrameReader, properties).load
+      val df = getDataFrameReader(sparkSession.hadoopConfiguration,dataFrameReader, properties).load
 
       compareSchema(getMappedSchema(schemaField), df.schema.toList)
 
@@ -95,7 +96,7 @@ class InputSparkRedshiftComponent(inputRDBMSEntity: InputRDBMSEntity, iComponent
         LOG.debug(name+" '" + properties.getProperty(name) + "' for input spark redshift component '")
       }
       if(name.equals("forward_spark_s3_credentials")){
-        dataFrameReader.option(name, properties.getProperty(name).toBoolean)
+        dataFrameReader.option(name, properties.getProperty(name))
         LOG.debug(name + "' "+ properties.getProperty(name) + "' for input spark redshift component ")
       }
     })

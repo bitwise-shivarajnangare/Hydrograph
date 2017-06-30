@@ -35,18 +35,19 @@ BaseComponentParams) extends SparkFlow with Serializable {
     LOG.trace("In method execute()")
     val schemaCreator = SchemaCreator(outputFileDelimitedEntity)
 
+
    try {
      cp.getDataFrame().select(schemaCreator.createSchema(): _*).write
-       .option("delimiter", outputFileDelimitedEntity.getDelimiter)
-       .option("quote", outputFileDelimitedEntity.getQuote)
-       .option("header", outputFileDelimitedEntity.getHasHeader)
-       .option("charset", outputFileDelimitedEntity.getCharset)
-       .option("strict", outputFileDelimitedEntity.isStrict)
-       .option("safe", outputFileDelimitedEntity.getSafe)
+       //.option("delimiter", outputFileDelimitedEntity.getDelimiter)
+       //.option("quote", outputFileDelimitedEntity.getQuote)
+       //.option("header", outputFileDelimitedEntity.getHasHeader)
+       //.option("charset", outputFileDelimitedEntity.getCharset)
+       //.option("strict", outputFileDelimitedEntity.isStrict)
+       //.option("safe", outputFileDelimitedEntity.getSafe)
        .option("dateFormat", "yyyy/MM/dd")
        .option("timestampFormat", "yyyy/MM/dd HH:mm:ss")
        .mode(if (outputFileDelimitedEntity.isOverWrite ) SaveMode.Overwrite else SaveMode.ErrorIfExists)
-       .csv(outputFileDelimitedEntity.getPath)
+       .text(outputFileDelimitedEntity.getPath)
 
    } catch {
      case e: AnalysisException if (e.getMessage().matches("(.*)cannot resolve(.*)given input columns(.*)"))=>

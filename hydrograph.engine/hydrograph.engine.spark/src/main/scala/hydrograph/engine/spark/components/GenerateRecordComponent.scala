@@ -57,7 +57,7 @@ class GenerateRecordComponent(generateRecordEntity: GenerateRecordEntity, iCompo
           throw new RuntimeException("Error in Generate Record Component " + generateRecordEntity.getComponentId + ", invalid noOfPartitions",nfe)
       }
     } else {
-      spark.sparkContext.defaultParallelism
+      spark.defaultParallelism
     }
 
 
@@ -76,7 +76,7 @@ class GenerateRecordComponent(generateRecordEntity: GenerateRecordEntity, iCompo
 
     try {
       val (fieldEntityLists: ArrayBuffer[FieldEntity], simpleDateFormats: ArrayBuffer[SimpleDateFormat]) = getFieldPropertiesList()
-      val randomGenerateRecordRDD: RDD[Row] = spark.sparkContext.parallelize(Seq[Row](), noOfPartitions)
+      val randomGenerateRecordRDD: RDD[Row] = spark.parallelize(Seq[Row](), noOfPartitions)
         .mapPartitionsWithIndex {
           (index, itr) => {
             LOG.info("Currently partition no : "
@@ -93,7 +93,8 @@ class GenerateRecordComponent(generateRecordEntity: GenerateRecordEntity, iCompo
 
         }
 
-      val df: DataFrame = spark.sqlContext.createDataFrame(randomGenerateRecordRDD, schema)
+      val sqlContext = new org.apache.spark.sql.SQLContext(spark)
+      val df: DataFrame = sqlContext.createDataFrame(randomGenerateRecordRDD, schema)
 
       LOG.info("Created Generate Record Component " + generateRecordEntity.getComponentId
         + " in Batch " + generateRecordEntity.getBatch + " with output socket " + key)

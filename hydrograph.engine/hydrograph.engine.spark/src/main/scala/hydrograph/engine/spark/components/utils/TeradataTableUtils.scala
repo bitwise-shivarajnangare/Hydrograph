@@ -92,7 +92,8 @@ case class TeradataTableUtils() {
    * @return structType schema from metadata
    */
   def getTableSchema(connectionURL: String, tableName: String, properties: Properties): StructType = {
-    JDBCRDD.resolveTable(connectionURL, tableName, properties)
+    //JDBCRDD.resolveTable(connectionURL, tableName, properties)
+    null
   }
 
   /*

@@ -37,8 +37,9 @@ class InputSequenceFileComponent(iSequenceEntity: InputFileSequenceFormatEntity,
       LOG.trace("Creating input file sequence format assembly for '"
         + iSequenceEntity.getComponentId() + "' for socket: '" + key)
       val schemaField = SchemaCreator(iSequenceEntity).makeSchema()
-      val inputRdd: RDD[Row] = iComponentsParams.sparkSession.sparkContext.objectFile(iSequenceEntity.getPath)
-      val df = iComponentsParams.sparkSession.createDataFrame(inputRdd, schemaField)
+      val inputRdd: RDD[Row] = iComponentsParams.sparkSession.objectFile(iSequenceEntity.getPath)
+      val sqlContext = new org.apache.spark.sql.SQLContext(iComponentsParams.sparkSession)
+      val df = sqlContext.createDataFrame(inputRdd, schemaField)
       Map(key -> df)
     }
     catch {

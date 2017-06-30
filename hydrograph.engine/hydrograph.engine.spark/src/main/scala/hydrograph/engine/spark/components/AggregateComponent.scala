@@ -29,6 +29,7 @@ import org.apache.spark.sql.{Column, DataFrame, Row}
 import org.slf4j.{Logger, LoggerFactory}
 
 import scala.collection.JavaConverters._
+import scala.reflect.ClassTag
 
 /**
   * The Class AggregateComponent.
@@ -169,10 +170,11 @@ class AggregateComponent(aggregateEntity: AggregateEntity, componentsParams: Bas
         }
       }
 
-    })(RowEncoder(operationSchema))
+    })
 
     val key = aggregateEntity.getOutSocketList.get(0).getSocketId
-    Map(key -> intermediateDf)
+    val sqlContext = new org.apache.spark.sql.SQLContext(componentsParams.sparkSession)
+    Map(key -> sqlContext.createDataFrame(intermediateDf,outputSchema))
 
   }
 

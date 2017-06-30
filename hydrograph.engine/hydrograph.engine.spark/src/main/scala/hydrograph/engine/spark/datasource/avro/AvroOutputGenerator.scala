@@ -34,7 +34,7 @@ import org.apache.hadoop.mapreduce.RecordWriter
 import org.apache.hadoop.mapreduce.TaskAttemptContext
 import org.apache.hadoop.mapreduce.TaskAttemptID
 import org.apache.spark.sql.Row
-import org.apache.spark.sql.execution.datasources.OutputWriter
+import org.apache.spark.sql.sources.OutputWriter
 import org.apache.spark.sql.types._
 
 /**

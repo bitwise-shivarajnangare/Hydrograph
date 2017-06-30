@@ -69,11 +69,13 @@ class FilterComponent(filterEntity: FilterEntity, componentsParams: BaseComponen
       val isFilter = (row: Row) => filterClass.isRemove(filterSparkOperations.inputRow.setRow(row))
 
       if (outSocket.getSocketType.equalsIgnoreCase("out")) {
-        val outDF = componentsParams.getDataFrame().filter(row => !isFilter(row))
+        //val outDF = componentsParams.getDataFrame().filter(row => !isFilter(row))
+        val outDF = componentsParams.getDataFrame()
         map += (outSocket.getSocketId -> outDF)
       }
       else {
-        val unusedDF = componentsParams.getDataFrame().filter(row => isFilter(row))
+        //val unusedDF = componentsParams.getDataFrame().filter(row => isFilter(row))
+        val unusedDF = componentsParams.getDataFrame()
         map += (outSocket.getSocketId -> unusedDF)
       }
     }

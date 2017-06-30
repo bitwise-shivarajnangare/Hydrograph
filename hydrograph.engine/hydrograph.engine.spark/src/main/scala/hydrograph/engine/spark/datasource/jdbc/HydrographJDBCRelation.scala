@@ -13,6 +13,7 @@
 
 package hydrograph.engine.spark.datasource.jdbc
 
+import org.apache.spark.SparkContext
 import org.apache.spark.sql._
 import org.apache.spark.sql.sources._
 import org.apache.spark.sql.types.StructType
@@ -23,9 +24,9 @@ import org.apache.spark.sql.types.StructType
   * @author Bitwise
   *
   */
-case class HydrographJDBCRelation(sparkSession: SparkSession)
+case class HydrographJDBCRelation(sparkSession: SparkContext)
   extends BaseRelation {
-  override def sqlContext: SQLContext = sparkSession.sqlContext
+  override def sqlContext: SQLContext =  new org.apache.spark.sql.SQLContext(sparkSession)
 
   override def schema: StructType = null
 }

@@ -50,10 +50,10 @@ BaseComponentParams) extends SparkFlow with Serializable {
 
     try {
     cp.getDataFrame().select(schemaCreator.createSchema():_*).write
-      .option("charset", outputFileFixedWidthEntity.getCharset)
-      .option("length",fieldsLen.mkString(","))
-      .option("strict", outputFileFixedWidthEntity.isStrict)
-      .option("safe", outputFileFixedWidthEntity.isSafe)
+      //.option("charset", outputFileFixedWidthEntity.getCharset)
+      //.option("length",fieldsLen.mkString(","))
+      //.option("strict", outputFileFixedWidthEntity.isStrict)
+      //.option("safe", outputFileFixedWidthEntity.isSafe)
       .option("dateFormats", schemaCreator.getDateFormats)
       .option("codec", SchemaUtils().getCodec(outputFileFixedWidthEntity))
       .mode( if (outputFileFixedWidthEntity.isOverWrite) SaveMode.Overwrite else SaveMode.ErrorIfExists )

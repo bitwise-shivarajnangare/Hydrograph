@@ -15,9 +15,8 @@ package hydrograph.engine.spark.components.platform
 import java.util.Set
 
 import hydrograph.engine.core.component.entity.elements.SchemaField
-import hydrograph.engine.spark.execution.tracking.PartitionStageAccumulator
-import org.apache.spark.sql.{DataFrame, SparkSession}
-import org.apache.spark.util.LongAccumulator
+import org.apache.spark.SparkContext
+import org.apache.spark.sql.DataFrame
 
 import scala.collection.mutable
 import scala.collection.mutable.ListBuffer
@@ -39,7 +38,7 @@ class BaseComponentParams() extends Serializable {
   
   val schemaFieldMap = new mutable.HashMap[String,Set[SchemaField]]()
 
-  var sparkSession: SparkSession = null
+  var sparkSession: SparkContext = null
 
   var schemaField:Array[SchemaField] = null
 
@@ -51,11 +50,11 @@ class BaseComponentParams() extends Serializable {
     schemaField
   }
 
-  def getSparkSession(): SparkSession = {
+  def getSparkSession(): SparkContext = {
     sparkSession
   }
 
-  def setSparkSession(ss: SparkSession): Unit = {
+  def setSparkSession(ss: SparkContext): Unit = {
     sparkSession = ss
   }
 

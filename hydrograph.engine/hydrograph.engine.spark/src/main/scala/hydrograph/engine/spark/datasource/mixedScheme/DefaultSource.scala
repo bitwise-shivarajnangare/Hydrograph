@@ -153,7 +153,7 @@ class DefaultSource extends RelationProvider
     val dateFormat: List[FastDateFormat] = getDateFormats(outDateFormats.split("\t").toList)
     var outputRow: String = ""
     var recordToBeSpilled: String = ""
-    val codec = CompressionCodecs.getCodec(dataFrame.sparkSession.sparkContext,parameters.getOrElse("codec", null))
+    val codec = CompressionCodecs.getCodec(dataFrame.sqlContext.sparkContext,parameters.getOrElse("codec", null))
     val strRDD = dataFrame.rdd.mapPartitionsWithIndex {
 
       case (index, iter) =>

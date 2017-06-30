@@ -152,8 +152,10 @@ class CumulateComponent(cumulateEntity: CumulateEntity, componentsParams: BaseCo
           Row.fromSeq(outRow)
         }
       }
-    })(RowEncoder(outputSchema))
-    Map(key -> outputDf)
+    })//(RowEncoder(outputSchema))
+    val sqlContext = new org.apache.spark.sql.SQLContext(componentsParams.sparkSession)
+    Map(key -> sqlContext.createDataFrame(outputDf,outputSchema))
+
   }
 
   def populateSortKeys(keysArray: Array[KeyField]): Array[Column] = {

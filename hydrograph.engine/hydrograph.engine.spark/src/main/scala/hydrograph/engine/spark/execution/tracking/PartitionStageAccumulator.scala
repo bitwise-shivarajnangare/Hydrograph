@@ -1,6 +1,6 @@
 package hydrograph.engine.spark.execution.tracking
 
-import org.apache.spark.util.AccumulatorV2
+import org.apache.spark.{Accumulable, Accumulator, AccumulatorParam, SparkContext}
 
 import scala.collection.immutable.HashMap
 
@@ -10,20 +10,21 @@ import scala.collection.immutable.HashMap
   * @author Bitwise
   *
   */
-class PartitionStageAccumulator extends AccumulatorV2 [Long, HashMap[Int, HashMap[Int, (Long, Int)]]] {
-  private var _map = new HashMap[Int, HashMap[Int, (Long, Int)]]()
+class PartitionStageAccumulator extends Accumulator[Long](0L,AccumulatorParam.LongAccumulatorParam ) {
+  /*//private var _map = new HashMap[Int, HashMap[Int, (Long, Int)]]()
+  private var _map = 0L
   private var _count = 0L
 
-  override def isZero: Boolean = _count == 0
+  def isZero: Boolean = _count == 0
 
-  override def copy(): PartitionStageAccumulator = {
+  def copy(): PartitionStageAccumulator = {
     val newAcc = new PartitionStageAccumulator
     newAcc._count = this._count
     newAcc._map = this._map
     newAcc
   }
 
-  override def reset(): Unit = {
+  def reset(): Unit = {
     _count = 0L
     _map = new HashMap[Int, HashMap[Int, (Long, Int)]]()
   }
@@ -36,7 +37,7 @@ class PartitionStageAccumulator extends AccumulatorV2 [Long, HashMap[Int, HashMa
 
   def partCounts = _map
 
-  override def merge(other: AccumulatorV2[Long, HashMap[Int, HashMap[Int, (Long, Int)]]]): Unit = other match {
+  override def merge(other: Accumulator[Long]): Unit = other match {
     case o: PartitionStageAccumulator => {
       //this foreach call is required to avoid bug (https://issues.scala-lang.org/browse/SI-9688) in scala
       //where internal private var kv is set to null sometimes
@@ -51,5 +52,5 @@ class PartitionStageAccumulator extends AccumulatorV2 [Long, HashMap[Int, HashMa
 
   def onEnd(stageId: Int, partitionId: Int, attemptNo: Int): Unit = { _map = _map.updated(stageId, new HashMap[Int, (Long, Int)].updated(partitionId, (_count, attemptNo))) }
 
-  override def value = _map
+  override def value = _map*/
 }

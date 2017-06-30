@@ -120,7 +120,7 @@ class JoinComponent(joinEntity: JoinEntity, componentsParams: BaseComponentParam
 
       val joinedDF = lhsDF.join(rhsDF, createJoinKey(lhsKeys, rhsKeys), "outer")
 
-      val session = joinedDF.sparkSession
+      val session = joinedDF.sqlContext
       val blankDF = session.createDataFrame(session.sparkContext.emptyRDD[Row], StructType(lhsDF.schema.fields ++ rhsDF.schema.fields))
       val blankDF_lhs = blankDF.select(convertStructFieldsTOString(lhsDF.schema): _*)
       val blankDF_rhs = blankDF.select(convertStructFieldsTOString(rhsDF.schema): _*)

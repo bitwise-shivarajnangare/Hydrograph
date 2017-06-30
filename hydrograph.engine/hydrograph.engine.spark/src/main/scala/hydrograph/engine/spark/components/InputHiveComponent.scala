@@ -33,8 +33,8 @@ class InputHiveComponent(entity: HiveEntityBase, parameters: BaseComponentParams
     LOG.trace("In method createComponent()")
     val sparkSession = parameters.getSparkSession()
 
-
-    val data = sparkSession.sql(constructQuery(entity))
+    val sqlContext = new org.apache.spark.sql.SQLContext(sparkSession)
+    val data = sqlContext.sql(constructQuery(entity))
     val key = entity.getOutSocketList.get(0).getSocketId
 
     LOG.info("Created Hive Input component " + entity.getComponentId + " in batch " + entity.getBatch + " with out socket " + key + " to read Hive table " + entity.getDatabaseName + "." + entity.getTableName)

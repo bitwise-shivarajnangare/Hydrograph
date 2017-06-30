@@ -35,17 +35,18 @@ class InputFileCsvComponent(iFileDelimitedEntity: InputFileDelimitedEntity, iCom
     val schemaCreator = SchemaCreator(iFileDelimitedEntity)
 
     try {
-      val df = iComponentsParams.getSparkSession().read
-        .option("sep", iFileDelimitedEntity.getDelimiter)
-        .option("quote", iFileDelimitedEntity.getQuote)
-        .option("header", iFileDelimitedEntity.isHasHeader)
-        .option("charset", iFileDelimitedEntity.getCharset)
-        .option("safe", iFileDelimitedEntity.isSafe)
-        .option("strict", iFileDelimitedEntity.isStrict)
+      val sqlContext = new org.apache.spark.sql.SQLContext(iComponentsParams.getSparkSession())
+      val df = sqlContext.read
+        //.option("sep", iFileDelimitedEntity.getDelimiter)
+        //.option("quote", iFileDelimitedEntity.getQuote)
+        //.option("header", iFileDelimitedEntity.isHasHeader)
+        //.option("charset", iFileDelimitedEntity.getCharset)
+        //.option("safe", iFileDelimitedEntity.isSafe)
+        //.option("strict", iFileDelimitedEntity.isStrict)
         .option("dateFormat", "yyyy/MM/dd")
         .option("timestampFormat", "yyyy/MM/dd HH:mm:ss")
         .schema(schemaCreator.makeSchema)
-        .csv(iFileDelimitedEntity.getPath)
+        .text(iFileDelimitedEntity.getPath)
 
       val key = iFileDelimitedEntity.getOutSocketList.get(0).getSocketId
       LOG.info("Created Input File Delimited Component "+ iFileDelimitedEntity.getComponentId

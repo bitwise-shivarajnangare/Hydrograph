@@ -26,7 +26,7 @@ package object avro {
    * Adds a method, `avro`, to DataFrameWriter that allows you to write avro files using
    * the DataFileWriter
    */
-  implicit class AvroDataFrameWriter[T](writer: DataFrameWriter[T]) {
+  implicit class AvroDataFrameWriter[T](writer: DataFrameWriter) {
     def avro: String => Unit = writer.format("hydrograph.engine.spark.datasource.avro").save
   }
 

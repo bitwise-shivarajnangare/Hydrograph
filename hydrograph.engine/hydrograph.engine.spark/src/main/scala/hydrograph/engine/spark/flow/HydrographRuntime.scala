@@ -25,8 +25,8 @@ import hydrograph.engine.spark.components.adapter.factory.AdapterFactory
 import hydrograph.engine.spark.components.base.SparkFlow
 import hydrograph.engine.spark.executiontracking.plugin.{CommandComponentsDefaultPlugin, ExecutionTrackingListener, ExecutionTrackingPlugin, HydrographCommandListener}
 import org.apache.hadoop.fs.{FileSystem, Path}
-import org.apache.spark.SparkConf
-import org.apache.spark.sql.SparkSession
+import org.apache.spark.{SparkConf, SparkContext}
+import org.apache.spark.sql.SQLContext
 import org.slf4j.{Logger, LoggerFactory}
 
 import scala.collection.JavaConverters._
@@ -68,9 +68,9 @@ class HydrographRuntime extends HydrographRuntimeService {
 
     val configProperties = getSparkProperties(hydrographJob,properties)
 
-    val sparkSessionBuilder: SparkSession.Builder = SparkSession.builder()
-      .appName(hydrographJob.getJAXBObject.getName)
-      .config(configProperties)
+    val sparkSessionBuilder: SparkContext = new SparkContext(configProperties.setAppName(hydrographJob.getJAXBObject.getName))
+      //.appName(hydrographJob.getJAXBObject.getName)
+      //.conf(configProperties)
 
 
     val schemaFieldHandler = new SchemaFieldHandler(
@@ -86,7 +86,7 @@ class HydrographRuntime extends HydrographRuntimeService {
 
     val traversal = new JAXBTraversal(updatedHydrographJob.getJAXBObject());
 
-    val sparkSession: SparkSession = enableHiveSupport(sparkSessionBuilder, traversal, properties).getOrCreate()
+    val sparkSession: SparkContext = enableHiveSupport(sparkSessionBuilder, traversal, properties)
 
     getAndSetHadoopProperties(sparkSession,hydrographJob,properties)
 
@@ -114,16 +114,16 @@ class HydrographRuntime extends HydrographRuntimeService {
 
   }
 
-  def enableHiveSupport(sessionBuilder: SparkSession.Builder, traversal: JAXBTraversal, properties: Properties): SparkSession.Builder = {
+  def enableHiveSupport(sessionBuilder: SparkContext, traversal: JAXBTraversal, properties: Properties): SparkContext = {
     LOG.trace("In method checkAndEnableHiveSupport()")
     if (traversal.isHiveComponentPresentInFlow) {
       LOG.debug("Hive components are present in flow. Enabling Hive support in SparkSession with warehouse location "+properties.getProperty("hydrograph.hive.warehouse"))
       sessionBuilder
-        .config("spark.sql.warehouse.dir", properties.getProperty("hydrograph.hive.warehouse"))
-        .enableHiveSupport()
+        .setLocalProperty("spark.sql.warehouse.dir", properties.getProperty("hydrograph.hive.warehouse"))
+        //.enableHiveSupport()
     } else {
       sessionBuilder
-        .config("spark.sql.warehouse.dir", properties.getProperty("hydrograph.tmp.warehouse"))
+        .setLocalProperty("spark.sql.warehouse.dir", properties.getProperty("hydrograph.tmp.warehouse"))
     }
     sessionBuilder
   }
@@ -179,7 +179,7 @@ class HydrographRuntime extends HydrographRuntimeService {
           var fileSystem: FileSystem = null
           LOG.info("Deleting temp path:" + tmpPath)
           try {
-            fileSystem = FileSystem.get(RuntimeContext.instance.sparkSession.sparkContext.hadoopConfiguration)
+            fileSystem = FileSystem.get(RuntimeContext.instance.sparkSession.hadoopConfiguration)
             //            fileSystem.delete(fullPath, true)
           }
           catch {
@@ -221,9 +221,9 @@ class HydrographRuntime extends HydrographRuntimeService {
     configProperties
   }
 
-  def getAndSetHadoopProperties(sparkSession: SparkSession, hydrographJob: HydrographJob, properties: Properties): Unit = {
+  def getAndSetHadoopProperties(sparkSession: SparkContext, hydrographJob: HydrographJob, properties: Properties): Unit = {
 
-    val configProperties = sparkSession.sparkContext.hadoopConfiguration
+    val configProperties = sparkSession.hadoopConfiguration
     val sparkProperties = properties.entrySet().asScala
     for (property <- sparkProperties) {
 

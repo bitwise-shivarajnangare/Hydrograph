@@ -15,15 +15,20 @@ package hydrograph.engine.spark.components
 
 import hydrograph.engine.core.component.entity.RemoveDupsEntity
 import hydrograph.engine.core.component.entity.elements.KeyField
+import hydrograph.engine.core.component.utils.OperationUtils
 import hydrograph.engine.core.constants.Keep
 import hydrograph.engine.spark.components.base.StraightPullComponentBase
 import hydrograph.engine.spark.components.platform.BaseComponentParams
+import hydrograph.engine.spark.components.utils.EncoderHelper
 import org.apache.spark.sql.catalyst.encoders.RowEncoder
 import org.apache.spark.sql.functions.col
+import org.apache.spark.sql.types.StructType
 import org.apache.spark.sql.{Column, DataFrame, Row}
 import org.slf4j.LoggerFactory
 
 import scala.collection.JavaConverters.asScalaBufferConverter
+import scala.reflect.ClassTag
+import scala.collection.JavaConverters._
 
 /**
   * The Class RemoveDupsComponent.
@@ -41,13 +46,16 @@ class RemoveDupsComponent(removeDupsEntity: RemoveDupsEntity, componentsParams: 
       logger.trace(removeDupsEntity.toString())
       var map: Map[String, DataFrame] = Map()
 
+      val inputSchema: StructType = componentsParams.getDataFrame().schema
+      val outputFields = OperationUtils.getAllFields(removeDupsEntity.getOutSocketList, inputSchema.map(_.name).asJava).asScala
       val keep = removeDupsEntity.getKeep
       val isUnusedRequired = removeDupsEntity.getOutSocketList.asScala.filter(p => p.getSocketType.equals("unused")).size > 0
       val primaryKeys = if (removeDupsEntity.getKeyFields == null) (Array[KeyField]()) else (removeDupsEntity.getKeyFields)
       val keyFieldsIndexArray = determineKeyFieldPos
       val secondaryKeys = if (removeDupsEntity.getSecondaryKeyFields == null) (Array[KeyField]()) else (removeDupsEntity.getSecondaryKeyFields)
       val sourceDf = componentsParams.getDataFrame()
-      val operationalSchema =  RowEncoder(componentsParams.getDataFrame().schema)
+      //val operationalSchema =  RowEncoder(componentsParams.getDataFrame().schema)
+      //val operationalSchema =  ClassTag(componentsParams.getDataFrame().first())
       val repartitionedDf = if (primaryKeys.isEmpty) (sourceDf.repartition(1)) else (sourceDf.repartition(primaryKeys.map { field => col(field.getName) }: _*))
       val sortedDf = repartitionedDf.sortWithinPartitions(populateSortKeys(primaryKeys ++ secondaryKeys): _*)
       val outDf = sortedDf.mapPartitions(itr => {
@@ -100,10 +108,11 @@ class RemoveDupsComponent(removeDupsEntity: RemoveDupsEntity, componentsParams: 
           }
         }
         }
-      })(operationalSchema)
+      })//(operationalSchema)
 
       val outKey = removeDupsEntity.getOutSocketList.asScala.filter(p => p.getSocketType.equals("out"))(0).getSocketId
-      map += (outKey -> outDf)
+      val sqlContext = new org.apache.spark.sql.SQLContext(componentsParams.sparkSession)
+      map += (outKey -> sqlContext.createDataFrame(outDf,inputSchema))
 
       if (isUnusedRequired) {
         val unUsedDf = sortedDf.mapPartitions(itr => {
@@ -154,10 +163,11 @@ class RemoveDupsComponent(removeDupsEntity: RemoveDupsEntity, componentsParams: 
             }
           }
           }
-        })(operationalSchema)
+        })//(operationalSchema)
 
         val unusedKey = removeDupsEntity.getOutSocketList.asScala.filter(p => p.getSocketType.equals("unused"))(0).getSocketId
-        map += (unusedKey -> unUsedDf)
+        val sqlContext = new org.apache.spark.sql.SQLContext(componentsParams.sparkSession)
+        map += (unusedKey -> sqlContext.createDataFrame(unUsedDf,inputSchema))
       }
 
       map

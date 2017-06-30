@@ -78,7 +78,8 @@ class FilterComponentWithUDF(filterEntity: FilterEntity, componentsParams: BaseC
     }
 
     val UDFName = filterEntity.getComponentId + "UDF"
-    sparkSession.udf.register(UDFName, FilterUDF(_: Row))
+    val sqlContext = new org.apache.spark.sql.SQLContext(componentsParams.sparkSession)
+    sqlContext.udf.register(UDFName, FilterUDF(_: Row))
 
     val operationInFields = filterEntity.getOperation.getOperationInputFields.toList.mkString(",")
     val filterQuery: String = UDFName + "(struct(" + operationInFields + "))"

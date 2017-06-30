@@ -21,6 +21,8 @@ import hydrograph.engine.spark.execution.tracking.PartitionStageAccumulator
 import org.apache.spark.TaskContext
 import org.apache.spark.sql.DataFrame
 import org.apache.spark.sql.catalyst.encoders.RowEncoder
+
+
 /**
   * The Class ExecutionTrackingComponent.
   *
@@ -37,9 +39,10 @@ class ExecutionTrackingComponent(executionTrackingEntity: ExecutionTrackingEntit
     executionTrackingEntity.getOperation.getOperationInputFields.foreach(e => fieldNameSet.add(e))
     val df = componentsParams.getDataFrame()
     val partAcc = new PartitionStageAccumulator
-    componentsParams.getSparkSession().sparkContext.register(partAcc, executionTrackingEntity.getComponentId)
+    //componentsParams.getSparkSession().register(partAcc, executionTrackingEntity.getComponentId)
 
-    val dataFrame= df.mapPartitions(itr=>{
+
+    /*val dataFrame= df.mapPartitions(itr=>{
 
       TaskContext.get().addTaskCompletionListener { context => partAcc.onEnd(context.stageId(), context.partitionId(), context.attemptNumber()) }
 //      val custAcc = partAcc
@@ -53,7 +56,7 @@ class ExecutionTrackingComponent(executionTrackingEntity: ExecutionTrackingEntit
         partAcc.add(1)
         row
       })
-    }) (RowEncoder(df.schema))
+    }) (RowEncoder(df.schema))*/
 
 
     /*val dataFrame=df.map(row=> {longAccumulator.add(1)
@@ -66,7 +69,9 @@ class ExecutionTrackingComponent(executionTrackingEntity: ExecutionTrackingEntit
       true})*/
     //dataFrame.foreach(r => println("******" + r))
 
-    Map(key -> dataFrame)
+    val sqlContext = new org.apache.spark.sql.SQLContext(componentsParams.sparkSession)
+    import sqlContext.implicits._
+    Map(key -> df)
   }
 
 

@@ -154,7 +154,7 @@ class ExecutionTrackingPlugin extends ExecutionTrackingListener with Manipulator
   override def addListener(runtimeContext: RuntimeContext): Unit = {
     jobInfo = new JobInfo(ComponentMapping.getListOfComponents())
     jobInfo.createComponentInfos()
-    runtimeContext.sparkSession.sparkContext.addSparkListener(this)
+    runtimeContext.sparkSession.addSparkListener(this)
 
   }
 

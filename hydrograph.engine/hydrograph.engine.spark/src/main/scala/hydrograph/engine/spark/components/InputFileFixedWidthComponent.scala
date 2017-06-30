@@ -43,11 +43,12 @@ class InputFileFixedWidthComponent(fileFixedWidthEntity: InputFileFixedWidthEnti
     }
 
     try {
-      val df = iComponentsParams.getSparkSession().read
-        .option("charset", fileFixedWidthEntity.getCharset)
-        .option("length",fieldsLen.mkString(","))
-        .option("strict", fileFixedWidthEntity.isStrict)
-        .option("safe", fileFixedWidthEntity.isSafe)
+      val sqlContext = new org.apache.spark.sql.SQLContext(iComponentsParams.getSparkSession())
+      val df = sqlContext.read
+        //.option("charset", fileFixedWidthEntity.getCharset)
+        //.option("length",fieldsLen.mkString(","))
+        //.option("strict", fileFixedWidthEntity.isStrict)
+        //.option("safe", fileFixedWidthEntity.isSafe)
         .option("dateFormats", schemaCreator.getDateFormats)
         .option("componentName", fileFixedWidthEntity.getComponentId)
         .schema(schemaCreator.makeSchema)

@@ -46,15 +46,15 @@ BaseComponentParams) extends SparkFlow with Serializable {
 //   val dateFormats=schemaCreator.getDateFormats()
    try {
      cp.getDataFrame().select(schemaCreator.createSchema():_*).write
-       .option("delimiter", outputFileDelimitedEntity.getDelimiter)
-       .option("quote", outputFileDelimitedEntity.getQuote)
-       .option("header", outputFileDelimitedEntity.getHasHeader)
-       .option("charset", outputFileDelimitedEntity.getCharset)
-       .option("strict", outputFileDelimitedEntity.isStrict)
-       .option("safe", outputFileDelimitedEntity.getSafe)
+       //.option("delimiter", outputFileDelimitedEntity.getDelimiter)
+       //.option("quote", outputFileDelimitedEntity.getQuote)
+       //.option("header", outputFileDelimitedEntity.getHasHeader)
+       //.option("charset", outputFileDelimitedEntity.getCharset)
+       //.option("strict", outputFileDelimitedEntity.isStrict)
+       //.option("safe", outputFileDelimitedEntity.getSafe)
        .option("dateFormats", schemaCreator.getDateFormats())
        .mode( if (outputFileDelimitedEntity.isOverWrite) SaveMode.Overwrite else SaveMode.ErrorIfExists )
-       .format("hydrograph.engine.spark.datasource.delimited")
+       //.format("hydrograph.engine.spark.datasource.delimited")
        .save(outputFileDelimitedEntity.getPath)
    } catch {
      case e: AnalysisException if (e.getMessage().matches("(.*)cannot resolve(.*)given input columns(.*)"))=>

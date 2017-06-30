@@ -62,10 +62,11 @@ class ToBeTransformComponent(transformEntity: TransformEntity, componentsParams:
     //inDf.createOrReplaceTempView("tmp")
     //val odf = inDf.sparkSession.sql("select id, city, number, length(name) name_length from tmp")
 
-    val odf = inDf.mapPartitions(itr => itr.map(row => outRow))(enc)
+    val odf = inDf.mapPartitions(itr => itr.map(row => outRow))//(enc)
 
     val key = transformEntity.getOutSocketList.get(0).getSocketId
-    Map(key -> odf)
+    val sqlContext = new org.apache.spark.sql.SQLContext(componentsParams.sparkSession)
+    Map(key -> sqlContext.createDataFrame(odf,outputSchema))
   }
 
 }

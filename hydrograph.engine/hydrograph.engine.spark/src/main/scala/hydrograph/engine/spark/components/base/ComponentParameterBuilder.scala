@@ -20,8 +20,8 @@ import hydrograph.engine.jaxb.commontypes.{TypeBaseInSocket, TypeBaseOutSocket}
 import hydrograph.engine.spark.components.platform.BaseComponentParams
 import hydrograph.engine.spark.execution.tracking.PartitionStageAccumulator
 import hydrograph.engine.spark.flow.RuntimeContext
-import org.apache.spark.sql.{DataFrame, SparkSession}
-import org.apache.spark.util.LongAccumulator
+import org.apache.spark.sql.DataFrame
+import org.apache.spark.{Accumulator, SparkContext}
 
 import scala.collection.JavaConverters._
 import scala.collection.mutable
@@ -130,7 +130,7 @@ object ComponentParameterBuilder {
       this
     }
 
-    def setSparkSession(sparkSession: SparkSession): Builder = {
+    def setSparkSession(sparkSession: SparkContext): Builder = {
       baseComponent.setSparkSession(sparkSession)
       this
     }

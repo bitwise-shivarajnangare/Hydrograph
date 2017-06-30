@@ -97,12 +97,12 @@ class TransformComponentWithUDF(transformEntity: TransformEntity, componentsPara
     }
     })
 
-    val operationUDFS = funcs.zip(operationOutputSchema).map(t => udf(t._1, t._2))
+    //val operationUDFS = funcs.zip(operationOutputSchema).map(t => udf(t._1, t._2))
     val inputs = transformsList.map(t => (t.operationEntity.getOperationId, struct(t.operationEntity.getOperationInputFields.toList.map(cols => col(cols)): _*)))
 
     //val inputs = operationInFields.map(op => (op._1, struct(op._2.map(cols => col(cols)): _*)))
 
-    operationUDFS.zip(inputs).foreach(f => transDF = transDF.withColumn(f._2._1, f._1(f._2._2)))
+    //operationUDFS.zip(inputs).foreach(f => transDF = transDF.withColumn(f._2._1, f._1(f._2._2)))
 
     val passthroughList = passThroughFields.map(field => col(field)).toList
     val mapList = mapFields.map(field => col(field.getSourceName).as(field.getName))

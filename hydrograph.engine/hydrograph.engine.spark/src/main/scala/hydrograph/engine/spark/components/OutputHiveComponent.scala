@@ -39,13 +39,15 @@ class OutputHiveComponent(entity: HiveEntityBase, oComponentParameters: BaseComp
     val sparkSession = oComponentParameters.getSparkSession()
 
 
-    oComponentParameters.getDataFrame().createOrReplaceTempView(TEMPTABLE)
+    //oComponentParameters.getDataFrame().createOrReplaceTempView(TEMPTABLE)
+
 
     LOG.debug("Setting hive.exec.dynamic.partition.mode to nonstrict as values for partition columns are known only during loading of the data into a Hive table")
-    sparkSession.sql("set hive.exec.dynamic.partition.mode=nonstrict")
-    sparkSession.sql("CREATE DATABASE IF NOT EXISTS "+entity.getDatabaseName)
-    sparkSession.sql(constructCreateTableQuery(entity))
-    sparkSession.sql(constructInsertIntoTableQuery(entity))
+    val sqlContext = new org.apache.spark.sql.SQLContext(sparkSession)
+    sqlContext.sql("set hive.exec.dynamic.partition.mode=nonstrict")
+    sqlContext.sql("CREATE DATABASE IF NOT EXISTS "+entity.getDatabaseName)
+    sqlContext.sql(constructCreateTableQuery(entity))
+    sqlContext.sql(constructInsertIntoTableQuery(entity))
 
     LOG.info("Created Output Hive Component " + entity.getComponentId + " in batch " + entity.getBatch + " to write Hive table " + entity.getDatabaseName + "." + entity.getTableName)
 

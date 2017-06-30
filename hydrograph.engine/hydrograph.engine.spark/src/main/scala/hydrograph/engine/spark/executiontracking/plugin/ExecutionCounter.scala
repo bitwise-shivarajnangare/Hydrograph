@@ -16,7 +16,7 @@ import java.util
 import java.util.Properties
 
 import hydrograph.engine.transformation.userfunctions.base.{FilterBase, ReusableRow}
-import org.apache.spark.util.LongAccumulator
+import org.apache.spark.Accumulator
 
 /**
   * The Class ExecutionCounter.
@@ -24,7 +24,7 @@ import org.apache.spark.util.LongAccumulator
   * @author Bitwise
   *
   */
-class ExecutionCounter(longAccumulator: LongAccumulator) extends FilterBase{
+class ExecutionCounter(longAccumulator: Accumulator[Long]) extends FilterBase{
 //  var incrementer : Long = _
   override def prepare(props: Properties, inputFields: util.ArrayList[String]): Unit = {
 

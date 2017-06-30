@@ -40,9 +40,10 @@ class UnionAllComponent(unionAllEntity: UnionAllEntity, componentsParams: BaseCo
   }
 
   def merge(dataFrameList: ListBuffer[DataFrame]): DataFrame = {
+
     def combine(dataFrame: DataFrame, acc: Int): DataFrame = {
-      if (dataFrameList.size <= acc) dataFrame
-      else combine(dataFrame.union(dataFrameList(acc).select(dataFrame.columns.head,dataFrame.columns.tail:_*)), acc + 1)
+      if (dataFrameList.size <= acc) {dataFrame}
+      else combine(dataFrame.unionAll(dataFrameList(acc).select(dataFrame.columns.head,dataFrame.columns.tail:_*)), acc + 1)
     }
     combine(dataFrameList(0), 1)
   }

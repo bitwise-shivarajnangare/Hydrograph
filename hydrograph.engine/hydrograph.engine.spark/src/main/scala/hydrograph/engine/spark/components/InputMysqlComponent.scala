@@ -89,10 +89,11 @@ class InputMysqlComponent(inputRDBMSEntity: InputRDBMSEntity, iComponentsParams:
       inputRDBMSEntity.getDatabaseName+extraUrlParams
 
     LOG.info("Connection url for Mysql input component: " + connectionURL)
-
+    val sqlContext = new org.apache.spark.sql.SQLContext(sparkSession)
     def createJdbcDataframe: Int => DataFrame = (partitionValue:Int) => partitionValue match {
-      case Int.MinValue => sparkSession.read.jdbc(connectionURL, selectQuery, properties)
-      case (partitionValues: Int)  =>  sparkSession.read.jdbc(connectionURL,
+
+      case Int.MinValue => sqlContext.read.jdbc(connectionURL, selectQuery, properties)
+      case (partitionValues: Int)  =>  sqlContext.read.jdbc(connectionURL,
                     selectQuery,
                     columnForPartitioning,
                     lowerBound,

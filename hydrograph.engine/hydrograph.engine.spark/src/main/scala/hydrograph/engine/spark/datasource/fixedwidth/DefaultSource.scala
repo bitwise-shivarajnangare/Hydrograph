@@ -80,7 +80,7 @@ class DefaultSource extends RelationProvider
     val safe: Boolean = parameters.getOrElse("safe","false").toBoolean
     val schema = dataFrame.schema
     val fieldlen: Array[Int] = toIntLength( parameters.get("length").get)
-    val codec = CompressionCodecs.getCodec(dataFrame.sparkSession.sparkContext,parameters.getOrElse("codec", null))
+    val codec = CompressionCodecs.getCodec(dataFrame.sqlContext.sparkContext,parameters.getOrElse("codec", null))
     val dateFormat: List[FastDateFormat] = getDateFormats(outDateFormats.split("\t").toList)
 
     val valueRDD = dataFrame.rdd.map(row => {

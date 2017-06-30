@@ -16,7 +16,8 @@ import hydrograph.engine.core.core.HydrographJob
 import hydrograph.engine.core.helper.JAXBTraversal
 import hydrograph.engine.core.schemapropagation.SchemaFieldHandler
 import hydrograph.engine.spark.components.adapter.factory.AdapterFactory
-import org.apache.spark.sql.SparkSession
+import org.apache.spark.SparkContext
+import org.apache.spark.sql.SQLContext
 import org.slf4j.{Logger, LoggerFactory}
 
 /**
@@ -26,7 +27,7 @@ import org.slf4j.{Logger, LoggerFactory}
   *
   */
 class RuntimeContext private(val adapterFactory: AdapterFactory, var traversal: JAXBTraversal,
-                             var hydrographJob: HydrographJob, var schemaFieldHandler: SchemaFieldHandler, var sparkSession: SparkSession)
+                             var hydrographJob: HydrographJob, var schemaFieldHandler: SchemaFieldHandler, var sparkSession: SparkContext)
 
 /**
   * The companion object for {@link hydrograph.engine.spark.flow.RuntimeContext RuntimeContext} class
@@ -37,7 +38,7 @@ object RuntimeContext {
   var _runtimeContext: RuntimeContext = null
 
   def apply(adapterFactory: AdapterFactory, traversal: JAXBTraversal, hydrographJob: HydrographJob, schemaFieldHandler:
-  SchemaFieldHandler, sparkSession: SparkSession): RuntimeContext = {
+  SchemaFieldHandler, sparkSession: SparkContext): RuntimeContext = {
     if (_runtimeContext == null) {
       LOG.info("Initializing RuntimeContext.")
       _runtimeContext = new RuntimeContext(adapterFactory, traversal, hydrographJob, schemaFieldHandler, sparkSession)

@@ -76,6 +76,15 @@ repositories {
         name 'redshift'
         url 'http://redshift-maven-repository.s3-website-us-east-1.amazonaws.com/release'
     }
+    maven {
+        name 'cloudera'
+        url 'https://repository.cloudera.com/content/repositories/releases/'
+    }
+
+    maven {
+        name 'spring'
+        url 'http://repo.spring.io/plugins-release/'
+    }
 
 }
 
@@ -91,12 +100,15 @@ configurations {
 }
 
 dependencies {
-	compile (group: 'org.apache.spark', name: 'spark-core_2.11', version: '2.0.2')
-    compile group: 'org.apache.spark', name: 'spark-sql_2.11', version: '2.0.2'
-    compile group: 'org.scala-lang', name: 'scala-library', version: '2.11.8'
-    compile group: 'org.apache.spark', name: 'spark-hive_2.11', version: '2.0.2'
-    compile group: 'org.apache.hadoop', name: 'hadoop-aws', version: '2.7.2'
+	compile (group: 'org.apache.spark', name: 'spark-core_2.11', version: '1.6.3')
+    compile group: 'org.apache.spark', name: 'spark-sql_2.11', version: '1.6.3'
+    compile group: 'org.scala-lang', name: 'scala-library', version: '2.10.2'
+    compile group: 'org.apache.spark', name: 'spark-hive_2.11', version: '1.6.3'
+    //compile group: 'org.apache.hadoop', name: 'hadoop-aws', version: '2.7.2'
+    compile group: 'org.apache.hadoop', name: 'hadoop-aws', version: '2.6.0-cdh5.4.4.3'
     compile group: 'mysql', name: 'mysql-connector-java', version: '5.1.34'
+    compile group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.7.0'
+    //compile group: 'org.apache.spark', name: 'spark-assembly', version: '1.5.2'
 
     compile group: 'org.apache.commons', name: 'commons-csv', version: '1.4'
 

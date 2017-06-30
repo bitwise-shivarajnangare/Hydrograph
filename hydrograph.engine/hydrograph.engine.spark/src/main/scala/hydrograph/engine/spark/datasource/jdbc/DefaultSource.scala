@@ -72,7 +72,7 @@ class DefaultSource extends CreatableRelationProvider with Serializable {
     } finally {
       conn.close()
     }
-    HydrographJDBCRelation(sqlContext.sparkSession)
+    HydrographJDBCRelation(sqlContext.sparkContext)
   }
 }
 

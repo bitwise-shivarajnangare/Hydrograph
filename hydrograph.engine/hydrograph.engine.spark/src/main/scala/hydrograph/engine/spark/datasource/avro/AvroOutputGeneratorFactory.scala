@@ -13,7 +13,7 @@
 package hydrograph.engine.spark.datasource.avro
 
 import org.apache.hadoop.mapreduce.TaskAttemptContext
-import org.apache.spark.sql.execution.datasources.{OutputWriter, OutputWriterFactory}
+import org.apache.spark.sql.sources.{OutputWriter, OutputWriterFactory}
 import org.apache.spark.sql.types.StructType
 /**
   * The Class AvroOutputGeneratorFactory.
@@ -23,7 +23,7 @@ import org.apache.spark.sql.types.StructType
   */
  private class AvroOutputGeneratorFactory(schema: StructType, recordName: String, recordNamespace: String) extends OutputWriterFactory {
 
-   override def newInstance(
+   def newInstance(
       path: String,
       bucketId: Option[Int],
       dataSchema: StructType,
@@ -34,4 +34,6 @@ import org.apache.spark.sql.types.StructType
    def getFileExtension(context: TaskAttemptContext): String ={
      ".avro"
    }
- }
+
+  override def newInstance(path: String, dataSchema: StructType, context: TaskAttemptContext): OutputWriter = null
+}

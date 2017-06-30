@@ -121,7 +121,7 @@ class JobInfo(listOfComponents: mutable.ListBuffer[Component]) {
 
     taskEnd.taskInfo.accumulables.foreach(f => {
 
-      listOfComponents.filter(c => c.newComponentId.equals(f.name.get)).foreach(component => {
+      listOfComponents.filter(c => c.newComponentId.equals(f.name)).foreach(component => {
 
 
         val alreadyPresentCompInfo  = componentInfoList.asScala
@@ -139,7 +139,7 @@ class JobInfo(listOfComponents: mutable.ListBuffer[Component]) {
             componentInfo.setComponentName(component.compName)
             var recordCount = 0L
             var countsList = new mutable.ListBuffer[Long]
-            if(f.value.get.isInstanceOf[java.lang.Long]){
+            if(f.value.isInstanceOf[java.lang.Long]){
               println("LongAcc Name : " + f.name + "LongAcc Value : "+ f.value)
             }
             else{
@@ -191,7 +191,7 @@ class JobInfo(listOfComponents: mutable.ListBuffer[Component]) {
     else taskStart.taskInfo.status
 
     taskStart.taskInfo.accumulables.foreach(f => {
-      listOfComponents.filter(c => c.newComponentId.equals(f.name.get)).foreach(component => {
+      listOfComponents.filter(c => c.newComponentId.equals(f.name)).foreach(component => {
 
 
         val alreadyPresentCompInfo  = componentInfoList.asScala
@@ -211,7 +211,7 @@ class JobInfo(listOfComponents: mutable.ListBuffer[Component]) {
             var recordCount = 0L
             var countsList = new mutable.ListBuffer[Long]
 
-            if(f.value.get.isInstanceOf[java.lang.Long]){
+            if(f.value.isInstanceOf[java.lang.Long]){
             }
             else{
               val tempMap = f.value.iterator.next().asInstanceOf[HashMap[Int, HashMap[Int, (Long, Int)]]]

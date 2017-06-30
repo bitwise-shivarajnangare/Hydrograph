@@ -64,7 +64,8 @@ class InputFileXMLComponent (iFileXMLEntity: InputFileXMLEntity, iComponentsPara
     }
 
     try {
-      val df = iComponentsParams.getSparkSession().read
+      val sqlContext = new org.apache.spark.sql.SQLContext(iComponentsParams.getSparkSession())
+      val df = sqlContext.read
         .option("charset", iFileXMLEntity.getCharset)
         .option("rowTag", iFileXMLEntity.getRowTag)
         .option("rootTag", iFileXMLEntity.getRootTag)

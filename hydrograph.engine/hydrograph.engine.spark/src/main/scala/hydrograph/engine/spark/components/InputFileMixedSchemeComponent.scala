@@ -58,12 +58,13 @@ class InputFileMixedSchemeComponent(iFileMixedSchemeEntity: InputFileMixedScheme
 //    val dateFormats=getDateFormats()
 //    val schemaField = SchemaCreator(iFileMixedSchemeEntity).makeSchema()
     try {
-      val df = iComponentsParams.getSparkSession().read
-        .option("quote", iFileMixedSchemeEntity.getQuote)
-        .option("componentName", iFileMixedSchemeEntity.getComponentId)
-        .option("charset", iFileMixedSchemeEntity.getCharset)
-        .option("safe", iFileMixedSchemeEntity.getSafe)
-        .option("strict", iFileMixedSchemeEntity.getStrict)
+      val sqlContext = new org.apache.spark.sql.SQLContext(iComponentsParams.getSparkSession())
+      val df = sqlContext.read
+        //.option("quote", iFileMixedSchemeEntity.getQuote)
+        //.option("componentName", iFileMixedSchemeEntity.getComponentId)
+        //.option("charset", iFileMixedSchemeEntity.getCharset)
+        //.option("safe", iFileMixedSchemeEntity.getSafe)
+        //.option("strict", iFileMixedSchemeEntity.getStrict)
         .option("dateFormats", schemaCreator.getDateFormats())
         .option("lengthsAndDelimiters", extractLengthsAndDelimiters(iFileMixedSchemeEntity.getFieldsList))
         .option("lengthsAndDelimitersType", extractLengthsAndDelimitersType(iFileMixedSchemeEntity.getFieldsList))

@@ -84,11 +84,11 @@ class OutputSparkRedshiftComponent(outputRDBMSEntity: OutputRDBMSEntity, oCompon
       .option("password", outputRDBMSEntity.getPassword)
       .option("dbtable", outputRDBMSEntity.getTableName)
 
-    getDataFrameWriter(oComponentsParams.getSparkSession().sparkContext.hadoopConfiguration, dataFrameWriter, properties).mode("append").save()
+    getDataFrameWriter(oComponentsParams.getSparkSession().hadoopConfiguration, dataFrameWriter, properties).mode("append").save()
 
   }
 
-  def getDataFrameWriter(hadoopConfiguration: Configuration, dataFrameWriter: DataFrameWriter[Row], properties: Properties): DataFrameWriter[Row] = {
+  def getDataFrameWriter(hadoopConfiguration: Configuration, dataFrameWriter: DataFrameWriter, properties: Properties): DataFrameWriter = {
 
     properties.stringPropertyNames().toList.foreach(name => {
       if (name.startsWith("fs.s3")) {
@@ -100,7 +100,7 @@ class OutputSparkRedshiftComponent(outputRDBMSEntity: OutputRDBMSEntity, oCompon
         LOG.debug(name + " '" + properties.getProperty(name) + "' for output spark redshift component '")
       }
       if (name.equals("forward_spark_s3_credentials")) {
-        dataFrameWriter.option(name, properties.getProperty(name).toBoolean)
+        dataFrameWriter.option(name, properties.getProperty(name))
         LOG.debug(name + " '" + properties.getProperty(name) + "' for output spark redshift component ")
       }
     })

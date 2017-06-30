@@ -53,7 +53,7 @@ class RunProgramComponent(assemblyEntityBase: AssemblyEntityBase) extends Comman
         }
       }
       catch {
-        case e => {
+        case e: Throwable => {
           throw new RuntimeException(e)
         }
       }

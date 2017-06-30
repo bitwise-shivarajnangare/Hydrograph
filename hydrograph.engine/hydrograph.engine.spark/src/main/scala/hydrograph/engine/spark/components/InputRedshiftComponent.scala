@@ -74,7 +74,8 @@ class InputRedshiftComponent(inputRDBMSEntity: InputRDBMSEntity, iComponentsPara
     LOG.info("Connection  url for input Redshift  component: " + connectionURL)
 
     try {
-      val df = sparkSession.read.jdbc(connectionURL, selectQuery, properties)
+      val sqlContext = new org.apache.spark.sql.SQLContext(sparkSession)
+      val df = sqlContext.read.jdbc(connectionURL, selectQuery, properties)
       compareSchema(getMappedSchema(schemaField), df.schema.toList)
       val key = inputRDBMSEntity.getOutSocketList.get(0).getSocketId
       Map(key -> df)

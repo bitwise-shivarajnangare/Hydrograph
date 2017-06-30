@@ -41,7 +41,8 @@ class InputFileParquetComponent(iFileParquetEntity: InputFileParquetEntity, iCom
       val fieldList = iFileParquetEntity.getFieldsList.asScala
       fieldList.foreach { field => LOG.debug("Field name '" + field.getFieldName + "for Component " + iFileParquetEntity.getComponentId) }
 
-      val df = iComponentsParams.getSparkSession().read.parquet(path)
+      val sqlContext = new org.apache.spark.sql.SQLContext(iComponentsParams.getSparkSession())
+      val df = sqlContext.read.parquet(path)
       SchemaUtils().compareSchema(schemaField.toList, df.schema.toList)
 
       val key = iFileParquetEntity.getOutSocketList.get(0).getSocketId

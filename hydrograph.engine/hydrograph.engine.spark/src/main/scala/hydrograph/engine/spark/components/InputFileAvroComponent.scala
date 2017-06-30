@@ -39,9 +39,10 @@ class InputFileAvroComponent(inputFileAvroEntity: InputFileAvroEntity, baseCompo
       val schemaField = SchemaCreator(inputFileAvroEntity).makeSchema()
       val sparkSession = baseComponentParams.getSparkSession()
       val schemaCreator = SchemaCreator(inputFileAvroEntity)
-      val df = sparkSession.read
-        .option("safe", inputFileAvroEntity.isSafe)
-        .option("strict", inputFileAvroEntity.isStrict)
+      val sqlContext = new org.apache.spark.sql.SQLContext(sparkSession)
+      val df = sqlContext.read
+        //.option("safe", inputFileAvroEntity.isSafe)
+        //.option("strict", inputFileAvroEntity.isStrict)
         .option("dateFormats", schemaCreator.getDateFormats)
         .schema(schemaField)
         .format("hydrograph.engine.spark.datasource.avro")

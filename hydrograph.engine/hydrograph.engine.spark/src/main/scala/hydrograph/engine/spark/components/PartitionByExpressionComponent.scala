@@ -72,7 +72,8 @@ class PartitionByExpressionComponent(partitionByExpressionEntity: PartitionByExp
         val socketId = outSocket.getSocketId
         val isDataForCurrentOutSocket = (row: Row) => partitionByExpressionClass.getPartition(partitionByExpressionSparkOperation.inputRow.setRow(row),
           numberOfPartitions).equals(socketId)
-        val df = componentsParams.getDataFrame.filter(isDataForCurrentOutSocket)
+        //val df = componentsParams.getDataFrame.filter(isDataForCurrentOutSocket)
+        val df = componentsParams.getDataFrame
         map += (socketId -> df)
       }
 

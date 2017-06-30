@@ -109,10 +109,11 @@ class TransformComponent(transformEntity: TransformEntity, componentsParams: Bas
         Row.fromSeq(outRow)
       })
 
-    })(RowEncoder(operationSchema))
+    })//(RowEncoder(operationSchema))
 
     val key = transformEntity.getOutSocketList.get(0).getSocketId
-    Map(key -> df)
+    val sqlContext = new org.apache.spark.sql.SQLContext(componentsParams.sparkSession)
+    Map(key -> sqlContext.createDataFrame(df,outputSchema))
 
   }
 
